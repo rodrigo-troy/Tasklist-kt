@@ -16,13 +16,13 @@ class Tasklist {
     fun getStatus() = status
 
     fun inputAction(task: String) {
-        if (status == Status.ADDING_TASK) {
+        if (status == Status.START_ADDING_TASK || status == Status.ADDING_TASK) {
             addTask(task)
             return
         }
 
         when (task) {
-            "add" -> status = Status.ADDING_TASK
+            "add" -> status = Status.START_ADDING_TASK
             "print" -> printTasks()
             "end" -> end()
             else -> println("The input action is invalid")
@@ -35,21 +35,30 @@ class Tasklist {
     }
 
     private fun addTask(task: String) {
+        if (status == Status.START_ADDING_TASK) {
+            currentTask = ""
+            status = Status.ADDING_TASK
+        }
+
         if (currentTask.isEmpty() && blankRegex.matches(task)) {
             println("The task is blank")
+            status = Status.WAITING_FOR_NEW_ACTION
+            return
+        }
+
+        if (!blankRegex.matches(task)) {
+            currentTask += "\n    $task"
             return
         }
 
         if (currentTask.isNotEmpty() && blankRegex.matches(task)) {
-            currentTask += "\n$task"
+            currentTask += "\n    ${task.trim()}"
             tasks.add(currentTask.trim())
             currentTask = ""
             status = Status.WAITING_FOR_NEW_ACTION
         }
 
-        if (blankRegex.matches(task)) {
-            return
-        }
+        return
     }
 
     private fun printTasks() {

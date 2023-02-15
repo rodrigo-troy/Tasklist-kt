@@ -10,5 +10,6 @@ $ Project: Tasklist
 enum class Status {
     WAITING_FOR_NEW_ACTION,
     ADDING_TASK,
+    START_ADDING_TASK,
     EXITING
 }
