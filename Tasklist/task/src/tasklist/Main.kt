@@ -1,25 +1,20 @@
 package tasklist
 
+
 fun main() {
-    val tasks = mutableListOf<String>()
-    println("Input the tasks (enter a blank line to end):")
+    val tasklist = Tasklist()
 
-    while (true) {
-        val task = readln()
-
-        if (task.isBlank()) {
-            break
+    while (tasklist.getStatus() != Status.EXITING) {
+        if (tasklist.getStatus() == Status.WAITING_FOR_NEW_ACTION) {
+            println("Input an action (add, print, end):")
         }
 
-        tasks.add(task.trim())
-    }
+        if (tasklist.getStatus() == Status.ADDING_TASK) {
+            println("Input a new task (enter a blank line to end):")
+        }
 
-    if (tasks.isEmpty()) {
-        println("No tasks have been input")
-        return
+        tasklist.inputAction(readln().trim().lowercase())
     }
-
-    tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i]}") }
 }
 
 
