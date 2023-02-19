@@ -9,7 +9,10 @@ $ Project: Tasklist
  */
 enum class Status {
     WAITING_FOR_NEW_ACTION,
-    ADDING_TASK,
+    ADDING_DESCRIPTION,
+    ADDING_PRIORITY,
+    ADDING_DATE,
+    ADDING_TIME,
     START_ADDING_TASK,
-    EXITING
+    EXIT
 }

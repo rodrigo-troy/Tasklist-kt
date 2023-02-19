@@ -8,15 +8,18 @@ $ Project: Tasklist
  * Time: 19:20
  */
 class Tasklist {
-    private val tasks = mutableListOf<String>()
+    private val tasks = mutableListOf<Task>()
     private var status = Status.WAITING_FOR_NEW_ACTION
     private val blankRegex = Regex("^(\\t|\\s)*\$")
-    private var currentTask = ""
+    private var currentTask: Task = Task("",
+                                         "",
+                                         "",
+                                         Priority.NONE)
 
     fun getStatus() = status
 
     fun inputAction(task: String) {
-        if (status == Status.START_ADDING_TASK || status == Status.ADDING_TASK) {
+        if (status == Status.START_ADDING_TASK || status == Status.ADDING_PRIORITY || status == Status.ADDING_DATE || status == Status.ADDING_TIME || status == Status.ADDING_DESCRIPTION) {
             addTask(task)
             return
         }
@@ -30,31 +33,68 @@ class Tasklist {
     }
 
     private fun end() {
-        status = Status.EXITING
+        status = Status.EXIT
         println("Tasklist exiting!")
     }
 
-    private fun addTask(task: String) {
+    private fun addTask(inputText: String) {
         if (status == Status.START_ADDING_TASK) {
-            currentTask = ""
-            status = Status.ADDING_TASK
+            status = Status.ADDING_PRIORITY
         }
 
-        if (currentTask.isEmpty() && blankRegex.matches(task)) {
+        if (status == Status.ADDING_PRIORITY) {
+            when (inputText.lowercase().trim()) {
+                "c" -> currentTask.priority = Priority.CRITICAL
+                "h" -> currentTask.priority = Priority.HIGH
+                "n" -> currentTask.priority = Priority.NORMAL
+                "l" -> currentTask.priority = Priority.LOW
+                else -> return
+            }
+
+            status = Status.ADDING_DATE
+            return
+        }
+
+        if (status == Status.ADDING_DATE && !currentTask.dateIsValid(inputText)) {
+            println("The input date is invalid")
+            return
+        }
+
+        if (status == Status.ADDING_DATE && currentTask.dateIsValid(inputText)) {
+            currentTask.date = inputText
+            status = Status.ADDING_TIME
+            return
+        }
+
+        if (status == Status.ADDING_TIME && !currentTask.timeIsValid(inputText)) {
+            println("The input time is invalid")
+            return
+        }
+
+        if (status == Status.ADDING_TIME && currentTask.timeIsValid(inputText)) {
+            currentTask.time = inputText
+            status = Status.ADDING_DESCRIPTION
+            return
+        }
+
+        if (status == Status.ADDING_DESCRIPTION && currentTask.descriptionIsEmpty() && blankRegex.matches(inputText)) {
             println("The task is blank")
             status = Status.WAITING_FOR_NEW_ACTION
             return
         }
 
-        if (!blankRegex.matches(task)) {
-            currentTask += "\n    $task"
+        if (status == Status.ADDING_DESCRIPTION && !blankRegex.matches(inputText)) {
+            currentTask.addDescription(inputText)
             return
         }
 
-        if (currentTask.isNotEmpty() && blankRegex.matches(task)) {
-            currentTask += "\n    ${task.trim()}"
-            tasks.add(currentTask.trim())
-            currentTask = ""
+        if (status == Status.ADDING_DESCRIPTION && !currentTask.descriptionIsEmpty() && blankRegex.matches(inputText)) {
+            currentTask.addDescription(inputText)
+            tasks.add(currentTask)
+            currentTask = Task("",
+                               "",
+                               "",
+                               Priority.NONE)
             status = Status.WAITING_FOR_NEW_ACTION
         }
 
@@ -67,6 +107,6 @@ class Tasklist {
             return
         }
 
-        tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i]}\n") }
+        tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i].date} ${tasks[i].time} ${tasks[i].priority}\n${tasks[i].description}\n") }
     }
 }
