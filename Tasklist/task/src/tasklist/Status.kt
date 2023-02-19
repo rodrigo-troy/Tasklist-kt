@@ -14,5 +14,8 @@ enum class Status {
     ADDING_DATE,
     ADDING_TIME,
     START_ADDING_TASK,
+    DELETING_TASK,
+    EDITING_TASK,
+    EDITING_FIELD,
     EXIT
 }

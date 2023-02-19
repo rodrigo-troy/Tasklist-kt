@@ -16,20 +16,80 @@ class Tasklist {
                                          "",
                                          Priority.NONE)
 
+    fun getTasksNumber() = tasks.size
+
     fun getStatus() = status
 
     fun inputAction(task: String) {
+        if (status == Status.EDITING_TASK) {
+            edit(task)
+            return
+        }
+        if (status == Status.DELETING_TASK) {
+            delete(task)
+            return
+        }
+
         if (status == Status.START_ADDING_TASK || status == Status.ADDING_PRIORITY || status == Status.ADDING_DATE || status == Status.ADDING_TIME || status == Status.ADDING_DESCRIPTION) {
             addTask(task)
             return
         }
 
         when (task) {
+            "edit" -> {
+                if (tasks.isEmpty()) {
+                    println("No tasks have been input")
+                    return
+                }
+
+                status = Status.EDITING_TASK; printTasks()
+            }
+
             "add" -> status = Status.ADDING_PRIORITY
             "print" -> printTasks()
             "end" -> end()
+            "delete" -> {
+                if (tasks.isEmpty()) {
+                    println("No tasks have been input")
+                    return
+                }
+
+                status = Status.DELETING_TASK; printTasks()
+            }
+
             else -> println("The input action is invalid")
         }
+    }
+
+    private fun edit(task: String) {
+        if (task.toIntOrNull() == null) {
+            println("Invalid task number")
+            return
+        }
+
+        if (task.toInt() < 1 || task.toInt() > tasks.size) {
+            println("Invalid task number")
+            return
+        }
+
+        currentTask = tasks[task.toInt() - 1]
+        status = Status.ADDING_PRIORITY
+    }
+
+    private fun delete(inputText: String) {
+        if (inputText.toIntOrNull() == null) {
+            println("Invalid task number")
+            return
+        }
+
+        if (inputText.toInt() < 1 || inputText.toInt() > tasks.size) {
+            println("Invalid task number")
+            return
+        }
+
+        tasks.removeAt(inputText.toInt() - 1)
+        println("The task is deleted")
+        status = Status.WAITING_FOR_NEW_ACTION
     }
 
     private fun end() {
