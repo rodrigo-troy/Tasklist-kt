@@ -25,7 +25,7 @@ class Tasklist {
         }
 
         when (task) {
-            "add" -> status = Status.START_ADDING_TASK
+            "add" -> status = Status.ADDING_PRIORITY
             "print" -> printTasks()
             "end" -> end()
             else -> println("The input action is invalid")
@@ -39,17 +39,11 @@ class Tasklist {
 
     private fun addTask(inputText: String) {
         if (status == Status.START_ADDING_TASK) {
-            status = Status.ADDING_PRIORITY
+            status = Status.ADDING_DESCRIPTION
         }
 
-        if (status == Status.ADDING_PRIORITY) {
-            when (inputText.lowercase().trim()) {
-                "c" -> currentTask.priority = Priority.CRITICAL
-                "h" -> currentTask.priority = Priority.HIGH
-                "n" -> currentTask.priority = Priority.NORMAL
-                "l" -> currentTask.priority = Priority.LOW
-                else -> return
-            }
+        if (status == Status.ADDING_PRIORITY && Priority.getPriority(inputText) != Priority.NONE) {
+            currentTask.priority = Priority.getPriority(inputText)
 
             status = Status.ADDING_DATE
             return
@@ -61,7 +55,7 @@ class Tasklist {
         }
 
         if (status == Status.ADDING_DATE && currentTask.dateIsValid(inputText)) {
-            currentTask.date = inputText
+            currentTask.setTaskDate(inputText)
             status = Status.ADDING_TIME
             return
         }
@@ -73,7 +67,7 @@ class Tasklist {
 
         if (status == Status.ADDING_TIME && currentTask.timeIsValid(inputText)) {
             currentTask.time = inputText
-            status = Status.ADDING_DESCRIPTION
+            status = Status.START_ADDING_TASK
             return
         }
 
@@ -107,6 +101,6 @@ class Tasklist {
             return
         }
 
-        tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i].date} ${tasks[i].time} ${tasks[i].priority}\n${tasks[i].description}\n") }
+        tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i].date} ${tasks[i].time} ${tasks[i].priority}${tasks[i].description}\n") }
     }
 }

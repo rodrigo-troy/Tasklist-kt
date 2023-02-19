@@ -16,17 +16,23 @@ data class Task(
         var date: String,
         var time: String,
         var priority: Priority) {
+    private val dateFormat = "yyyy-MM-dd"
+    private val simpleDateFormat = SimpleDateFormat(dateFormat)
+
+    fun setTaskDate(date: String) {
+        val parse = simpleDateFormat.parse(date)
+        this.date = simpleDateFormat.format(parse)
+    }
 
     fun addDescription(description: String) {
         this.description += "\n    $description"
     }
 
     fun dateIsValid(date: String): Boolean {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        dateFormat.isLenient = false
+        this.simpleDateFormat.isLenient = false
 
         return try {
-            dateFormat.parse(date)
+            simpleDateFormat.parse(date)
             true
         } catch (e: ParseException) {
             false

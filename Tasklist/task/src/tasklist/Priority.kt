@@ -16,7 +16,7 @@ enum class Priority(val priority: String) {
 
     companion object {
         fun getPriority(priority: String): Priority {
-            return when (priority) {
+            return when (priority.uppercase().trim()) {
                 CRITICAL.priority -> CRITICAL
                 HIGH.priority -> HIGH
                 NORMAL.priority -> NORMAL
