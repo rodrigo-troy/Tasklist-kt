@@ -21,16 +21,24 @@ class Tasklist {
     fun getStatus() = status
 
     fun inputAction(task: String) {
-        if (status == Status.EDITING_TASK) {
+        if (status == Status.START_EDITING_TASK ||
+            status == Status.EDITING_DESCRIPTION ||
+            status == Status.EDITING_PRIORITY ||
+            status == Status.EDITING_DATE ||
+            status == Status.EDITING_TIME) {
             edit(task)
             return
         }
-        if (status == Status.DELETING_TASK) {
+        if (status == Status.START_DELETING_TASK) {
             delete(task)
             return
         }
 
-        if (status == Status.START_ADDING_TASK || status == Status.ADDING_PRIORITY || status == Status.ADDING_DATE || status == Status.ADDING_TIME || status == Status.ADDING_DESCRIPTION) {
+        if (status == Status.START_ADDING_TASK ||
+            status == Status.ADDING_PRIORITY ||
+            status == Status.ADDING_DATE ||
+            status == Status.ADDING_TIME ||
+            status == Status.ADDING_DESCRIPTION) {
             addTask(task)
             return
         }
@@ -42,7 +50,7 @@ class Tasklist {
                     return
                 }
 
-                status = Status.EDITING_TASK; printTasks()
+                status = Status.START_EDITING_TASK; printTasks()
             }
 
             "add" -> status = Status.ADDING_PRIORITY
@@ -54,7 +62,7 @@ class Tasklist {
                     return
                 }
 
-                status = Status.DELETING_TASK; printTasks()
+                status = Status.START_DELETING_TASK; printTasks()
             }
 
             else -> println("The input action is invalid")
@@ -62,18 +70,32 @@ class Tasklist {
     }
 
     private fun edit(task: String) {
-        if (task.toIntOrNull() == null) {
-            println("Invalid task number")
+        if (status == Status.START_EDITING_TASK) {
+            if (task.toIntOrNull() == null) {
+                println("Invalid task number")
+                return
+            }
+
+            if (task.toInt() < 1 || task.toInt() > tasks.size) {
+                println("Invalid task number")
+                return
+            }
+
+            currentTask = tasks[task.toInt() - 1]
+            status = Status.START_EDITING_FIELD
             return
         }
 
-        if (task.toInt() < 1 || task.toInt() > tasks.size) {
-            println("Invalid task number")
+        if (status == Status.START_EDITING_FIELD) {
+            when (task) {
+                "task" -> status = Status.EDITING_DESCRIPTION
+                "priority" -> status = Status.EDITING_PRIORITY
+                "date" -> status = Status.EDITING_DATE
+                "time" -> status = Status.EDITING_TIME
+                else -> println("Invalid field")
+            }
             return
         }
-
-        currentTask = tasks[task.toInt() - 1]
-        status = Status.ADDING_PRIORITY
     }
 
     private fun delete(inputText: String) {
@@ -104,7 +126,6 @@ class Tasklist {
 
         if (status == Status.ADDING_PRIORITY && Priority.getPriority(inputText) != Priority.NONE) {
             currentTask.priority = Priority.getPriority(inputText)
-
             status = Status.ADDING_DATE
             return
         }
