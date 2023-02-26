@@ -25,11 +25,7 @@ fun main() {
             println("Input the time (hh:mm):")
         }
 
-        if (tasklist.getStatus() == Status.START_DELETING_TASK) {
-            println("Input the task number (1-${tasklist.getTasksNumber()}):")
-        }
-
-        if (tasklist.getStatus() == Status.START_EDITING_TASK) {
+        if (tasklist.getStatus() == Status.START_DELETING_TASK || tasklist.getStatus() == Status.START_EDITING_TASK) {
             println("Input the task number (1-${tasklist.getTasksNumber()}):")
         }
 
