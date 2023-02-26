@@ -55,7 +55,7 @@ class Tasklist {
                 status = Status.START_EDITING_TASK; printTasks()
             }
             "add" -> status = Status.ADDING_PRIORITY
-            "print" -> printTasks()
+            "print" -> printTable()
             "end" -> end()
             "delete" -> {
                 if (tasks.isEmpty()) {
@@ -237,5 +237,50 @@ class Tasklist {
         }
 
         tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i]}\n") }
+    }
+
+    fun printTable() {
+        if (tasks.isEmpty()) {
+            println("No tasks have been input")
+            return
+        }
+
+        println("+----+------------+-------+---+---+--------------------------------------------+")
+        println("| N  |    Date    | Time  | P | D |                   Task                     |")
+        println("+----+------------+-------+---+---+--------------------------------------------+")
+        tasks.indices.forEach { i ->
+            val task = tasks[i]
+            val priority = task.priority
+            val description = task.description
+            val date = task.date
+            val time = task.time
+            val taskNumber = i + 1
+            val taskNumberString = if (taskNumber <= 8) " $taskNumber  " else " $taskNumber "
+            val priorityString = if (priority == Priority.NONE) " " else priority.toString()
+            val descriptionString = if (description.isEmpty()) " " else description.replace("\n",
+                                                                                            " ")
+            val dateString = if (date.isEmpty()) " " else "$date  "
+            val timeString = if (time.isEmpty()) " " else "$time  "
+
+            //split description into multiple lines of 44 characters
+            val descriptionLines = mutableListOf<String>()
+            var descriptionLine = ""
+            descriptionString.split(" ").forEach { word ->
+                if (descriptionLine.length + word.length <= 44) {
+                    descriptionLine += "$word "
+                } else {
+                    descriptionLines.add(descriptionLine)
+                    descriptionLine = "$word "
+                }
+            }
+
+            descriptionLines.indices.forEach { j ->
+                if (j == 0) {
+                    println("|$taskNumberString|$dateString|$timeString|$priorityString| |${descriptionLines[j]}|")
+                } else {
+                    println("|    |            |       |   | |${descriptionLines[j]}|")
+                }
+            }
+        }
     }
 }
