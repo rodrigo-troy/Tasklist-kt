@@ -9,7 +9,7 @@ fun main() {
             println("Input an action (add, print, edit, delete, end):")
         }
 
-        if (tasklist.getStatus() == Status.START_ADDING_TASK) {
+        if (tasklist.getStatus() == Status.START_ADDING_TASK || tasklist.getStatus() == Status.START_EDITING_DESCRIPTION) {
             println("Input a new task (enter a blank line to end):")
         }
 

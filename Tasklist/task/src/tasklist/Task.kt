@@ -1,5 +1,9 @@
 package tasklist
-
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
@@ -16,16 +20,41 @@ data class Task(
         var date: String,
         var time: String,
         var priority: Priority) {
-    private val dateFormat = "yyyy-MM-dd"
-    private val simpleDateFormat = SimpleDateFormat(dateFormat)
+    private val simpleTimeFormat = SimpleDateFormat("HH:mm")
+    private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+    private fun getDueTag(): DueTag {
+        val currentDate = Clock.System.now().toLocalDateTime(TimeZone.of("UTC-0")).date
+        val taskDate = LocalDate(date.substring(0,
+                                                4).toInt(),
+                                 date.substring(5,
+                                                7).toInt(),
+                                 date.substring(8,
+                                                10).toInt())
+        val daysUntil = currentDate.daysUntil(taskDate)
+
+        //println("currentDate: $currentDate")
+        //println("taskDate: $taskDate")
+
+        return when {
+            daysUntil < 0 -> DueTag.OVERDUE
+            daysUntil == 0 -> DueTag.TODAY
+            else -> DueTag.IN_TIME
+        }
+    }
 
     fun setTaskDate(date: String) {
         val parse = simpleDateFormat.parse(date)
         this.date = simpleDateFormat.format(parse)
     }
 
+    fun setTaskTime(task: String) {
+        val parse = simpleTimeFormat.parse(task)
+        this.time = simpleTimeFormat.format(parse)
+    }
+
     fun addDescription(description: String) {
-        this.description += "\n    $description"
+        this.description += "\n   $description"
     }
 
     fun dateIsValid(date: String): Boolean {
@@ -39,19 +68,26 @@ data class Task(
         }
     }
 
-    fun descriptionIsEmpty(): Boolean {
-        return description.isEmpty()
-    }
-
     fun timeIsValid(time: String): Boolean {
-        val timeFormat = SimpleDateFormat("HH:mm")
-        timeFormat.isLenient = false
+        simpleTimeFormat.isLenient = false
 
         return try {
-            timeFormat.parse(time)
+            simpleTimeFormat.parse(time)
             true
         } catch (e: ParseException) {
             false
         }
+    }
+
+    fun descriptionIsEmpty(): Boolean {
+        return description.isEmpty()
+    }
+
+    override fun toString(): String {
+        return "${this.date} ${this.time} ${this.priority} ${this.getDueTag()}${this.description}"
+    }
+
+    fun clearDescription() {
+        this.description = ""
     }
 }
