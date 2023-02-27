@@ -52,10 +52,11 @@ class Tasklist {
                     return
                 }
 
-                status = Status.START_EDITING_TASK; printTasks()
+                status = Status.START_EDITING_TASK; print()
             }
+
             "add" -> status = Status.ADDING_PRIORITY
-            "print" -> printTable()
+            "print" -> print()
             "end" -> end()
             "delete" -> {
                 if (tasks.isEmpty()) {
@@ -63,7 +64,7 @@ class Tasklist {
                     return
                 }
 
-                status = Status.START_DELETING_TASK; printTasks()
+                status = Status.START_DELETING_TASK; print()
             }
             else -> println("The input action is invalid")
         }
@@ -230,16 +231,7 @@ class Tasklist {
         println("Tasklist exiting!")
     }
 
-    private fun printTasks() {
-        if (tasks.isEmpty()) {
-            println("No tasks have been input")
-            return
-        }
-
-        tasks.indices.forEach { i -> println("${i + 1}${if (i <= 8) "  " else " "}${tasks[i]}\n") }
-    }
-
-    fun printTable() {
+    private fun print() {
         if (tasks.isEmpty()) {
             println("No tasks have been input")
             return
@@ -269,16 +261,15 @@ class Tasklist {
                 if (trimmedLine.length <= 44) {
                     descriptionLines.add(trimmedLine + " ".repeat(44 - trimmedLine.length))
                 } else {
-                    var descriptionLine = ""
-                    trimmedLine.split(" ").forEach { word ->
-                        if (trimmedLine.length + word.length <= 44) {
-                            descriptionLine += "$word "
-                        } else {
-                            descriptionLines.add(descriptionLine)
-                            descriptionLine = " $word "
-                        }
+                    val lines = trimmedLine.length / 44
+                    for (j in 0 until lines) {
+                        descriptionLines.add(trimmedLine.substring(j * 44,
+                                                                   (j + 1) * 44))
                     }
-                    descriptionLines.add(descriptionLine)
+                    if (trimmedLine.length % 44 != 0) {
+                        descriptionLines.add(trimmedLine.substring(lines * 44)
+                                                 .trim() + " ".repeat(44 - trimmedLine.length % 44))
+                    }
                 }
             }
 

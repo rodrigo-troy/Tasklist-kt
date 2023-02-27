@@ -33,7 +33,7 @@ fun main() {
             println("Input a field to edit (priority, date, time, task):")
         }
 
-        tasklist.inputAction(readln().trim().lowercase())
+        tasklist.inputAction(readln().trim())
     }
 }
 
