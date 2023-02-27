@@ -23,7 +23,7 @@ data class Task(
     private val simpleTimeFormat = SimpleDateFormat("HH:mm")
     private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    private fun getDueTag(): DueTag {
+    fun getDueTag(): DueTag {
         val currentDate = Clock.System.now().toLocalDateTime(TimeZone.of("UTC-0")).date
         val taskDate = LocalDate(date.substring(0,
                                                 4).toInt(),

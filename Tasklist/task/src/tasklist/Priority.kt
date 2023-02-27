@@ -7,7 +7,7 @@ $ Project: Tasklist
  * Date: 15-02-23
  * Time: 20:47
  */
-enum class Priority(val priority: String) {
+enum class Priority(private val priority: String) {
     CRITICAL("C"),
     HIGH("H"),
     NORMAL("N"),

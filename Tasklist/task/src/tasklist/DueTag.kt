@@ -7,7 +7,7 @@ $ Project: Tasklist
  * Date: 25-02-23
  * Time: 21:05
  */
-enum class DueTag(val value: String) {
+enum class DueTag(private val value: String) {
     IN_TIME("I"),
     TODAY("T"),
     OVERDUE("O");
