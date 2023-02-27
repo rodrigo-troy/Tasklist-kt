@@ -275,7 +275,7 @@ class Tasklist {
                             descriptionLine += "$word "
                         } else {
                             descriptionLines.add(descriptionLine)
-                            descriptionLine = "$word "
+                            descriptionLine = " $word "
                         }
                     }
                     descriptionLines.add(descriptionLine)
@@ -289,8 +289,7 @@ class Tasklist {
                     println("|    |            |       |   |   |${descriptionLines[j]}|")
                 }
             }
+            println("+----+------------+-------+---+---+--------------------------------------------+")
         }
-
-        println("+----+------------+-------+---+---+--------------------------------------------+")
     }
 }
