@@ -1,5 +1,10 @@
 package tasklist
 
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import java.io.File
+
 /**
  * Created with IntelliJ IDEA.
 $ Project: Tasklist
@@ -16,6 +21,33 @@ class Tasklist {
                                          "",
                                          Priority.NONE)
 
+
+    init {
+        if (File("tasklist.json").exists()) {
+            loadJson()
+        }
+    }
+
+
+    private fun loadJson() {
+        val json = File("tasklist.json").readText()
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+
+        val type = Types.newParameterizedType(List::class.java,
+                                              Task::class.java)
+        val taskListAdapter = moshi.adapter<List<Task?>>(type)
+        val taskList = taskListAdapter.fromJson(json)
+
+        taskList?.forEach { task ->
+            if (task != null) {
+                tasks.add(task)
+            }
+        }
+
+    }
+
     fun getTasksNumber() = tasks.size
 
     fun getStatus() = status
@@ -31,6 +63,7 @@ class Tasklist {
             edit(task)
             return
         }
+
         if (status == Status.START_DELETING_TASK) {
             delete(task)
             return
@@ -66,6 +99,7 @@ class Tasklist {
 
                 status = Status.START_DELETING_TASK; print()
             }
+
             else -> println("The input action is invalid")
         }
     }
@@ -153,6 +187,19 @@ class Tasklist {
         }
     }
 
+    private fun saveTasks() {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+
+        val type = Types.newParameterizedType(List::class.java,
+                                              Task::class.java)
+        val taskListAdapter = moshi.adapter<List<Task?>>(type)
+        val file = File("tasklist.json")
+
+        file.appendText(taskListAdapter.toJson(tasks))
+    }
+
     private fun addTask(inputText: String) {
         if (status == Status.START_ADDING_TASK) {
             status = Status.ADDING_DESCRIPTION
@@ -228,6 +275,7 @@ class Tasklist {
 
     private fun end() {
         status = Status.EXIT
+        saveTasks()
         println("Tasklist exiting!")
     }
 
